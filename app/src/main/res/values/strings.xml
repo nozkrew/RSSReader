@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">RSSReader</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_list_item">ListItem</string>
+
+    <string name="url">http://www.sport.fr/RSS/sport1.xml</string>
+</resources>

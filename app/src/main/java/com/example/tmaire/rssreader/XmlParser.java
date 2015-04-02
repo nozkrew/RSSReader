@@ -13,9 +13,13 @@ import android.util.Xml;
 
 public class XmlParser {
 	private static final String ns=null;
-	
+
+    public XmlParser(){
+
+    }
+
 	public List<Entry>parse(InputStream in) throws XmlPullParserException,IOException
-	{ 
+	{
 	    try {
 		    XmlPullParser parser=Xml.newPullParser();
 		    parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);

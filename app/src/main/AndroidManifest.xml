@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.tmaire.rssreader" >
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -19,6 +21,10 @@
         <activity
             android:name=".ListItem"
             android:label="@string/title_activity_list_item" >
+        </activity>
+        <activity
+            android:name=".ReadItem"
+            android:label="@string/title_activity_read_item" >
         </activity>
     </application>
 

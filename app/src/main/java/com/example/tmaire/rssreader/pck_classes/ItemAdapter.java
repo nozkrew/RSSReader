@@ -32,9 +32,17 @@ public class ItemAdapter extends ArrayAdapter<Item> {
         TextView title = (TextView) convertView.findViewById(R.id.title);
         TextView description = (TextView) convertView.findViewById(R.id.description);
         // Populate the data into the template view using the data object
-        title.setText(item.getTitle());
+        title.setText(cutString(item.getTitle()));
         description.setText(item.getDescription());
         // Return the completed view to render on screen
         return convertView;
+    }
+
+    public String cutString(String chaine){
+        if(chaine.length() >= 40){
+            chaine = chaine.substring(0, 40);
+            return chaine.concat("...");
+        }
+        return chaine;
     }
 }

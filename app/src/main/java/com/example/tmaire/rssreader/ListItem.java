@@ -1,11 +1,17 @@
 package com.example.tmaire.rssreader;
 
 import android.content.Intent;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Xml;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.example.tmaire.rssreader.pck_classes.Item;
@@ -15,6 +21,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,43 +38,9 @@ public class ListItem extends ActionBarActivity {
 
         //Récupération de l'intent
         Intent intent = getIntent();
-        String url = intent.getStringExtra("url");
 
-        try {
-            Log.i("RssReader", "Début try");
-            Log.i("RssReader", "Debut URL" + url);
-            URL uri = new URL(url);
+        new InputStreamTask().execute(intent.getStringExtra("url"));
 
-            Log.i("RssReader", "Stream");
-            InputStream urlStream = uri.openStream();
-
-            Log.i("RssReader", "Début Parser");
-            XmlParser parser = new XmlParser();
-            List<XmlParser.Entry> entries = parser.parse(urlStream);
-
-            //Init d'une liste d'item
-            ArrayList<Item> listItem = new ArrayList<Item>();
-
-            for(XmlParser.Entry entry : entries){
-                Item item = new Item(entry.title, entry.description, entry.link);
-                listItem.add(item);
-            }
-
-            // Création itemAdapter
-            ItemAdapter itemAdapter = new ItemAdapter(this, listItem);
-
-            ListView list = (ListView) findViewById(R.id.listViewItem);
-            list.setAdapter(itemAdapter);
-
-            Log.i("RssReader", "Fin du Try");
-
-        } catch (IOException e) {
-            Log.i("RssReader", "Catch IOException");
-            e.printStackTrace();
-        } catch (XmlPullParserException e) {
-            Log.i("RssReader", "Catch XmlPullParser");
-            e.printStackTrace();
-        }
     }
 
 
@@ -91,5 +64,68 @@ public class ListItem extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private class InputStreamTask extends AsyncTask<String, Void, InputStream>{
+        @Override
+        protected InputStream doInBackground(String... url){
+            try {
+                InputStream input = new URL(url[0]).openStream();
+                Log.i("RssReader", "Debut Try InputStreamTask doInBackground");
+                return input;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(InputStream input){
+            new RecupeXmlTask().execute(input);
+        }
+    }
+
+    private class RecupeXmlTask extends AsyncTask<InputStream, Void, List<XmlParser.Entry>>{
+
+        @Override
+        protected List<XmlParser.Entry> doInBackground(InputStream... input){
+            XmlParser parser = new XmlParser();
+            try {
+                Log.i("RssReader", "Debut Try RecupeXmlTask doInBackground");
+                Log.i("RssReader", "input : " + input[0]);
+                if(input[0] != null){
+                    List<XmlParser.Entry> entries = parser.parse(input[0]);
+                    return entries;
+                }
+            } catch (XmlPullParserException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+        @Override
+        protected void onPostExecute(List<XmlParser.Entry> entries){
+            ArrayList<Item> listItem = new ArrayList<Item>();
+            for(XmlParser.Entry entry : entries){
+                Item item = new Item(entry.title, entry.description, entry.link);
+                listItem.add(item);
+            }
+
+            ItemAdapter itemAdapter = new ItemAdapter(ListItem.this, listItem);
+
+            final ListView listView = (ListView) findViewById(R.id.listViewItem);
+            listView.setAdapter(itemAdapter);
+
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View child, int position, long id) {
+                    Intent intentBrowser = new Intent(Intent.ACTION_VIEW);
+                    Item item = (Item) listView.getItemAtPosition(position);
+                    intentBrowser.setData(Uri.parse(item.getLink()));
+                    startActivity(intentBrowser);
+                }
+            });
+        }
     }
 }

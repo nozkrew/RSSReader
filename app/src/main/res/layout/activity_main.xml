@@ -23,4 +23,5 @@
         android:id="@+id/buttonSend"
         android:layout_below="@+id/editTextUrl"
         android:layout_centerHorizontal="true" />
+
 </RelativeLayout>

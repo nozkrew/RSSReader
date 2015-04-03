@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.tmaire.rssreader.pck_classes.Item;
 import com.example.tmaire.rssreader.pck_classes.ItemAdapter;
@@ -94,7 +95,9 @@ public class ListItem extends ActionBarActivity {
                 Log.i("RssReader", "Debut Try RecupeXmlTask doInBackground");
                 Log.i("RssReader", "input : " + input[0]);
                 if(input[0] != null){
+                    Log.i("RssReader", "Début du If");
                     List<XmlParser.Entry> entries = parser.parse(input[0]);
+                    Log.i("RssReader", "Entries : " + entries);
                     return entries;
                 }
             } catch (XmlPullParserException e) {
@@ -106,26 +109,31 @@ public class ListItem extends ActionBarActivity {
         }
         @Override
         protected void onPostExecute(List<XmlParser.Entry> entries){
-            ArrayList<Item> listItem = new ArrayList<Item>();
-            for(XmlParser.Entry entry : entries){
-                Item item = new Item(entry.title, entry.description, entry.link);
-                listItem.add(item);
-            }
-
-            ItemAdapter itemAdapter = new ItemAdapter(ListItem.this, listItem);
-
-            final ListView listView = (ListView) findViewById(R.id.listViewItem);
-            listView.setAdapter(itemAdapter);
-
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View child, int position, long id) {
-                    Intent intentBrowser = new Intent(Intent.ACTION_VIEW);
-                    Item item = (Item) listView.getItemAtPosition(position);
-                    intentBrowser.setData(Uri.parse(item.getLink()));
-                    startActivity(intentBrowser);
+            if(entries != null) {
+                ArrayList<Item> listItem = new ArrayList<Item>();
+                for (XmlParser.Entry entry : entries) {
+                    Item item = new Item(entry.title, entry.description, entry.link);
+                    listItem.add(item);
                 }
-            });
+
+                ItemAdapter itemAdapter = new ItemAdapter(ListItem.this, listItem);
+
+                final ListView listView = (ListView) findViewById(R.id.listViewItem);
+                listView.setAdapter(itemAdapter);
+
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View child, int position, long id) {
+                        Intent intentBrowser = new Intent(Intent.ACTION_VIEW);
+                        Item item = (Item) listView.getItemAtPosition(position);
+                        intentBrowser.setData(Uri.parse(item.getLink()));
+                        startActivity(intentBrowser);
+                    }
+                });
+            }
+            else{
+                Toast.makeText(getApplicationContext(), "Erreur URL", Toast.LENGTH_LONG).show();
+            }
         }
     }
 }

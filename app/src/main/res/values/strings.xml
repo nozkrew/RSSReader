@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">RSSReader</string>
+    <string name="app_name">RSS Reader</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_list_item">ListItem</string>
+    <string name="title_activity_list_item">Liste des flux</string>
 
     <string name="url">http://rss.lemonde.fr/c/205/f/3050/index.rss</string>
     <string name="title_activity_read_item">ReadItem</string>
